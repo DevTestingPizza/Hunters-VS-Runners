@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.28010.2048
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HuntersVsRunners", "HuntersVsRunners\HuntersVsRunners.csproj", "{B92E6177-B3B5-4DA3-9072-9A66A3409C44}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HuntersVsRunnersServer", "HuntersVsRunnersServer\HuntersVsRunnersServer.csproj", "{5E0D73F7-A23E-4F67-B46F-63561226E107}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{B92E6177-B3B5-4DA3-9072-9A66A3409C44}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B92E6177-B3B5-4DA3-9072-9A66A3409C44}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B92E6177-B3B5-4DA3-9072-9A66A3409C44}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5E0D73F7-A23E-4F67-B46F-63561226E107}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5E0D73F7-A23E-4F67-B46F-63561226E107}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5E0D73F7-A23E-4F67-B46F-63561226E107}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5E0D73F7-A23E-4F67-B46F-63561226E107}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

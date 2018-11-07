@@ -440,8 +440,8 @@ namespace HuntersVsRunners
             bg.Dispose();
             fg.Dispose();
             cb.Dispose();
-            GameController.gameRestarting = false;
-            GameController.Go();
+            //GameController.gameRestarting = false;
+            //GameController.Go();
 
         }
     }

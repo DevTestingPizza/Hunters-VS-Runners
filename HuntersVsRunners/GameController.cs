@@ -52,11 +52,80 @@ namespace HuntersVsRunners
             //new CheckPoint(){ Location = new Vector3( -1542.50f, 1372.70f, 124.75f ), Red = 255, Green = 255, Blue = 0, Alpha = 150, Type = 4, Id = 9 },
         };
 
-        public static readonly uint runner_veh_hash = (uint)GetHashKey("wastelander");
         //public readonly uint runner_veh_hash = (uint)GetHashKey("ratloader2");
         //public readonly uint runner_veh_hash = (uint)GetHashKey("deluxo");
+        public static readonly uint runner_veh_hash = (uint)GetHashKey("wastelander");
         public static readonly uint hunter_veh_hash = (uint)GetHashKey("rogue");
 
+        /// <summary>
+        /// constructor
+        /// </summary>
+        public GameController()
+        {
+            //OnResourceStart();
+            SetManualShutdownLoadingScreenNui(true);
+            EventHandlers.Add("onClientMapStart", new Action(OnResourceStart));
+            OnResourceStart();
+        }
+
+        private async void OnResourceStart()
+        {
+            SetManualShutdownLoadingScreenNui(true);
+
+
+            //DoScreenFadeOut(0);
+
+
+
+
+            StartAudioScene("MP_LEADERBOARD_SCENE");
+
+
+
+
+            //ResurrectPed(PlayerPedId());
+            Exports["spawnmanager"].setAutoSpawn(false);
+            Exports["spawnmanager"].spawnPlayer(PlayerId() + 1, new Action(PlayerSpawned));
+
+        }
+
+        private async void PlayerSpawned()
+        {
+            //while (!IsScreenFadedOut())
+            //{
+            //    HideHudAndRadarThisFrame();
+            //    DoScreenFadeOut(0);
+            //    await Delay(0);
+            //}
+            //DoScreenFadeOut(100);
+            
+            DoScreenFadeOut(0);
+            SwitchOutPlayer(PlayerPedId(), 0, 1);
+            while (GetPlayerSwitchState() < 5)
+            {
+                await Delay(0);
+                HideHudAndRadarThisFrame();
+            }
+            while (!IsScreenFadedOut())
+            {
+                HideHudAndRadarThisFrame();
+                await Delay(0);
+            }
+            ShutdownLoadingScreen();
+            ShutdownLoadingScreenNui();
+            DoScreenFadeIn(100);
+            while (!IsScreenFadedIn())
+            {
+                HideHudAndRadarThisFrame();
+                await Delay(0);
+            }
+
+            StopAudioScene("MP_LEADERBOARD_SCENE");
+            await Delay(5000);
+            SwitchInPlayer(PlayerPedId());
+        }
+
+        /*
         public GameController()
         {
             RequestScriptAudioBank("DLC_STUNT/STUNT_RACE_01", false);
@@ -190,11 +259,15 @@ namespace HuntersVsRunners
                             }
                         }
                     }
+                    if (id == PlayerId())
+                    {
+                        team = 2;
+                        gameRestarting = false;
+                        Go();
+                        return;
+                    }
                 }
-                if (id == PlayerId())
-                {
-                    team = 2;
-                }
+                
                 if (team == 1) // runner
                 {
                     if (await Runner.SpawnPlayer(new Vector3(2533.77f, 4888.76f, 36.74f), 225.1f, runner_veh_hash))
@@ -866,5 +939,6 @@ namespace HuntersVsRunners
             }
             return _camera;
         }
+        */
     }
 }
