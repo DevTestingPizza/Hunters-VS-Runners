@@ -665,6 +665,9 @@ namespace HuntersVsRunners
                 PushScaleformMovieFunctionParameterInt(0);
                 PopScaleformMovieFunctionVoid();
 
+
+
+                await SetDetailsMissionName("Hunters VS Runners", "", "");
                 await BaseScript.Delay(100);
                 UpdateDetails();
                 await BaseScript.Delay(100);
@@ -807,9 +810,7 @@ namespace HuntersVsRunners
             PushScaleformMovieFunctionN("DISPLAY_DATA_SLOT");
             PushScaleformMovieFunctionParameterInt(0);
             PopScaleformMovieFunctionVoid();
-
             SetSettingsCurrentDescription(settingsList[GameController.FeCurrentSelection].Description, false);
-
         }
 
         private void SetSettingsSlot(int row, string leftText, string rightSomething, bool selectable, int type, int rowColor)
