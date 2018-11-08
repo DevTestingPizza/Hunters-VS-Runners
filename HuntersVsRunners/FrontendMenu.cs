@@ -733,20 +733,44 @@ namespace HuntersVsRunners
 
         }
 
-        public void SetDetailsMissionName(string name)
+        public async Task SetDetailsMissionName(string name, string rp, string cash, string textureDict = "prop_screen_nhp_base3", string textureName = "3_2_prep_01")
         {
-            PushScaleformMovieFunctionN("SET_COLUMN_TITLE");
-            PushScaleformMovieMethodParameterInt(1);
-            AddTextEntry("hvsr_details_column_name", name);
-            BeginTextCommandScaleformString("");
-            EndTextCommandScaleformString();
-            BeginTextCommandScaleformString("hvsr_details_column_name");
-            EndTextCommandScaleformString();
-            PopScaleformMovieFunctionVoid();
+            if (!HasStreamedTextureDictLoaded(textureDict))
+            {
+                RequestStreamedTextureDict(textureDict, true);
+                while (!HasStreamedTextureDictLoaded(textureDict))
+                {
+                    await BaseScript.Delay(0);
+                }
+            }
+            PushScaleformMovieFunctionN("SET_COLUMN_TITLE");                // scale function name
+            PushScaleformMovieMethodParameterInt(1);                        // column id;
+            PushScaleformMovieFunctionParameterString(name);                // mission name
+            PushScaleformMovieFunctionParameterString(name);                // mission name
+            PushScaleformMovieMethodParameterInt(0);                        // 1 = R* verified, 2 = R* created
+            PushScaleformMovieMethodParameterString(textureDict);           // texture dict
+            PushScaleformMovieMethodParameterString(textureName);           // texture name
+            PushScaleformMovieMethodParameterInt(0);                        // idk
+            PushScaleformMovieMethodParameterInt(0);                        // idk
+            if (string.IsNullOrEmpty(rp))
+            {
+                PushScaleformMovieMethodParameterBool(false);               // RP
+            }
+            else
+            {
+                PushScaleformMovieMethodParameterString(rp);                // RP
+            }
+            if (string.IsNullOrEmpty(cash))
+            {
+                PushScaleformMovieMethodParameterBool(false);               // CASH
+            }
+            else
+            {
+                PushScaleformMovieMethodParameterString(cash);              // CASH
+            }
 
-            PushScaleformMovieFunctionN("DISPLAY_DATA_SLOT");
-            PushScaleformMovieFunctionParameterInt(1);
-            PopScaleformMovieFunctionVoid();
+            PopScaleformMovieFunctionVoid();                                // done
+
         }
 
         public void UpdateSettings(bool update = false, int row = -1)
