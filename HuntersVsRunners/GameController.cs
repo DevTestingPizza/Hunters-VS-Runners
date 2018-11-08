@@ -137,18 +137,12 @@ namespace HuntersVsRunners
             SetLoadingPromptTextEntry("hvr_loading_game");
             StopAudioScene("MP_LEADERBOARD_SCENE");
 
-            fe.SetSubtitle("There are 2 teams. The ~r~HUNTERS~s~ and the ~b~RUNNERS~s~. ~n~The ~b~RUNNERS~s~ will have to race to the finish line, while the ~r~HUNTERS~s~ try to take them out.");
+            fe.SetSubtitle("There are 2 teams. The ~r~HUNTERS~s~ and the ~b~RUNNERS~s~. The ~b~RUNNERS~s~ will have to race to the finish line, while the ~r~HUNTERS~s~ try to take them out.");
 
-            fe.SetColumnTitle(1, $"PLAYERS - ~1~", NetworkGetNumConnectedPlayers());
-
-            fe.SetDetailsMissionName("Map #1");
-
-            foreach (Player p in new PlayerList())
-            {
-                fe.AddPlayer(p, p.ServerId, "WAITING", "SNAIL", PlayerIcon.FREEMODE_RANK, HudColor.HUD_COLOUR_FREEMODE, HudColor.HUD_COLOUR_MENU_GREEN);
-            }
-
-            fe.SetDetailsMissionName("Map #1");
+            //foreach (Player p in new PlayerList())
+            //{
+            //    fe.AddPlayer(p, p.ServerId, "WAITING", "SNAIL", PlayerIcon.FREEMODE_RANK, HudColor.HUD_COLOUR_FREEMODE, HudColor.HUD_COLOUR_MENU_GREEN);
+            //}
 
             fe.settingsList.Add(new SettingsItem(0, new List<string>() { "Wastelander", "Rat-Truck", "Bison", "Blazer" }, "Vehicle", "Choose a vehicle. This vehicle will be used for when you are on the runners team.", 0, true, 0, 0));
             fe.settingsList.Add(new SettingsItem(1, new List<string>() { "West Coast", "Radio Los Santos", "Radio Off" }, "Radio Station", "Let's mix some unrelated stuff.", 0, true, 0, 0));
@@ -165,24 +159,13 @@ namespace HuntersVsRunners
 
             while (!AreWeReadyToStart())
             {
-                if (GetGameTimer() - updateTimer > 500)
+                if (GetGameTimer() - updateTimer > 1000)
                 {
-                    fe.SetDetailsMissionName("Map #1");
-
-                    //PushScaleformMovieFunctionN("DISPLAY_DATA_SLOT");
-                    //PushScaleformMovieFunctionParameterInt(1);
-                    //PopScaleformMovieFunctionVoid();
-
-                    fe.SetColumnTitle(1, $"PLAYERS - ~1~", NetworkGetNumConnectedPlayers());
-
-                    //PushScaleformMovieFunctionN("DISPLAY_DATA_SLOT");
-                    //PushScaleformMovieFunctionParameterInt(3);
-                    //PopScaleformMovieFunctionVoid();
-
-                    foreach (Player p in new PlayerList())
-                    {
-                        fe.UpdatePlayer(p, p.ServerId, "WAITING", "SNAIL", PlayerIcon.FREEMODE_RANK, HudColor.HUD_COLOUR_FREEMODE, HudColor.HUD_COLOUR_MENU_GREEN);
-                    }
+                    fe.UpdatePlayers();
+                    //foreach (Player p in new PlayerList())
+                    //{
+                    //    fe.UpdatePlayer(p, p.ServerId, "WAITING", "SNAIL", PlayerIcon.FREEMODE_RANK, HudColor.HUD_COLOUR_FREEMODE, HudColor.HUD_COLOUR_MENU_GREEN);
+                    //}
                     updateTimer = GetGameTimer();
                 }
                 SetCloudHatOpacity(0.002f);
@@ -272,6 +255,7 @@ namespace HuntersVsRunners
             PushScaleformMovieFunctionParameterBool(false); // scriptSetMenuState // _loc5_
             PopScaleformMovieFunctionVoid();
         }
+
         private async Task FrontendSelectionManager()
         {
             if (frontendActive)

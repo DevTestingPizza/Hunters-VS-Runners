@@ -425,6 +425,41 @@ namespace HuntersVsRunners
 
 
         #region main public functions
+        public async void UpdatePlayers()
+        {
+            SetColumnTitle(1, $"PLAYERS - ~1~ OF 2-12", NetworkGetNumConnectedPlayers());
+
+            PlayerList list = new PlayerList();
+            foreach (Player p in list)
+            {
+                if (playerRows.Any(Row => Row.Player == p))
+                {
+                    UpdatePlayer(p, p.ServerId, "WAITING", "SNAIL", PlayerIcon.FREEMODE_RANK, HudColor.HUD_COLOUR_FREEMODE, HudColor.HUD_COLOUR_MENU_GREEN);
+                }
+                else
+                {
+                    AddPlayer(p, p.ServerId, "WAITING", "SNAIL", PlayerIcon.FREEMODE_RANK, HudColor.HUD_COLOUR_FREEMODE, HudColor.HUD_COLOUR_MENU_GREEN);
+                }
+            }
+            await BaseScript.Delay(0);
+            List<PlayerRow> tmp_delete_rows_list = new List<PlayerRow>();
+            foreach (PlayerRow pr in playerRows)
+            {
+                if (!(list.Any(P => P == pr.Player)))
+                {
+                    tmp_delete_rows_list.Add(pr);
+                }
+            }
+            await BaseScript.Delay(0);
+            if (tmp_delete_rows_list.Count > 0)
+            {
+                foreach (PlayerRow pr in tmp_delete_rows_list)
+                {
+                    DeletePlayer(pr.RowIndex);
+                }
+            }
+        }
+
         public async void AddPlayer(Player player, int rank, string status, string crewTag, PlayerIcon icon, HudColor rowColor, HudColor statusColor)
         {
             if (!IsVisible)
