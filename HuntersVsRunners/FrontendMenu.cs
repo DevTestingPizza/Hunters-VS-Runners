@@ -313,8 +313,10 @@ namespace HuntersVsRunners
         public string Description;
         public int SelectedIndex;
         public bool Selectable;
+        public int Type;
+        public int RowColor;
 
-        public SettingsItem(int row, List<string> items, string title, string description, int selectedIndex, bool selectable)
+        public SettingsItem(int row, List<string> items, string title, string description, int selectedIndex, bool selectable, int type, int rowColor)
         {
             this.RowIndex = row;
             this.SelectionItems = items;
@@ -322,6 +324,8 @@ namespace HuntersVsRunners
             this.Description = description;
             this.SelectedIndex = selectedIndex;
             this.Selectable = selectable;
+            this.Type = type;
+            this.RowColor = rowColor;
         }
     }
 
@@ -647,8 +651,8 @@ namespace HuntersVsRunners
                 PushScaleformMovieFunctionN("SET_COLUMN_FOCUS");
                 PushScaleformMovieFunctionParameterInt(0); // column index // _loc7_
                 PushScaleformMovieFunctionParameterBool(true); // highlightIndex // _loc6_
-                PushScaleformMovieFunctionParameterBool(false); // scriptSetUniqID // _loc4_
-                PushScaleformMovieFunctionParameterBool(false); // scriptSetMenuState // _loc5_
+                PushScaleformMovieFunctionParameterBool(true); // scriptSetUniqID // _loc4_
+                PushScaleformMovieFunctionParameterBool(true); // scriptSetMenuState // _loc5_
                 PopScaleformMovieFunctionVoid();
             }
             else
@@ -728,14 +732,14 @@ namespace HuntersVsRunners
             if (update && row != -1)
             {
                 var s = settingsList[row];
-                SetSettingsSlot(s.RowIndex, s.Title, s.SelectionItems[s.SelectedIndex], s.Selectable, 0);
+                SetSettingsSlot(s.RowIndex, s.Title, s.SelectionItems[s.SelectedIndex], s.Selectable, s.Type, s.RowColor);
                 Debug.WriteLine(s.SelectedIndex.ToString());
             }
             else
             {
                 foreach (var s in settingsList)
                 {
-                    SetSettingsSlot(s.RowIndex, s.Title, s.SelectionItems[s.SelectedIndex], s.Selectable, 0);
+                    SetSettingsSlot(s.RowIndex, s.Title, s.SelectionItems[s.SelectedIndex], s.Selectable, s.Type, s.RowColor);
                     //Debug.WriteLine(s.SelectionItems[s.SelectedIndex]);
                 }
             }
@@ -745,9 +749,11 @@ namespace HuntersVsRunners
             PushScaleformMovieFunctionParameterInt(0);
             PopScaleformMovieFunctionVoid();
 
+            SetSettingsCurrentDescription(settingsList[GameController.FeCurrentSelection].Description, false);
+
         }
 
-        private void SetSettingsSlot(int row, string leftText, string rightSomething, bool selectable, int type)
+        private void SetSettingsSlot(int row, string leftText, string rightSomething, bool selectable, int type, int rowColor)
         {
             ///// COLUMN 0 (LEFT) - ROW 1
             PushScaleformMovieFunctionN("SET_DATA_SLOT");
@@ -756,20 +762,42 @@ namespace HuntersVsRunners
 
             // com.rockstargames.gtav.pauseMenu.pauseMenuItems.PauseMenuBaseItem::__set__data
             PushScaleformMovieFunctionParameterInt(0); // menu ID 0
-            PushScaleformMovieFunctionParameterInt(0); // unique ID 0
+            PushScaleformMovieFunctionParameterInt(99); // unique ID 0
             PushScaleformMovieFunctionParameterInt(type); // type 0
 
+            //if (type != 0)
+            //{
+            //PushScaleformMovieFunctionParameterInt(28); // initialIndex 0 (right thing color)
+            //}
+            //else
+            //{
             PushScaleformMovieFunctionParameterInt(0); // initialIndex 0 (right thing color)
+            //}
+
             PushScaleformMovieFunctionParameterBool(selectable); // isSelectable true
 
             PushScaleformMovieFunctionParameterString(leftText);
-            PushScaleformMovieFunctionParameterString("");
+
+
+            PushScaleformMovieFunctionParameterInt(0);
 
             ///// UNSURE HOW THIS WORKS, BUT IF YOU UNCOMMENT THIS, IT'LL ADD AN ICON TO THE ROW.
             ///// MAKING THE STRING "20" AND THE BOOL TRUE SEEMS TO DO SOMETHING WITH A ROCKSTAR LOGO INSTEAD.
             PushScaleformMovieFunctionParameterInt(0);
             PushScaleformMovieFunctionParameterString(rightSomething);
-            PushScaleformMovieFunctionParameterInt(0);
+
+
+            if (type == 2)
+            {
+                PushScaleformMovieFunctionParameterInt(rowColor);
+            }
+            else
+            {
+                PushScaleformMovieFunctionParameterInt(0);
+            }
+
+
+            //PushScaleformMovieFunctionParameterBool(false); // reduce colors
 
             PushScaleformMovieFunctionParameterBool(false); // SOMETHING WITH ROCKSTAR/STAR LOGO SWITCHING.
             ///// FINISH.

@@ -145,14 +145,14 @@ namespace HuntersVsRunners
 
             foreach (Player p in new PlayerList())
             {
-                fe.AddPlayer(p, p.ServerId, "WAITING", "SNAIL", PlayerIcon.GLOBE, HudColor.HUD_COLOUR_NET_PLAYER1_DARK, HudColor.HUD_COLOUR_MENU_GREEN);
+                fe.AddPlayer(p, p.ServerId, "WAITING", "SNAIL", PlayerIcon.FREEMODE_RANK, HudColor.HUD_COLOUR_NET_PLAYER1_DARK, HudColor.HUD_COLOUR_MENU_GREEN);
             }
 
             fe.SetDetailsMissionName("Map #1");
 
-            fe.settingsList.Add(new SettingsItem(0, new List<string>() { "Option One", "Option Two", "Option Three" }, "Title #1", "Choose an option!", 0, true));
-            fe.settingsList.Add(new SettingsItem(1, new List<string>() { "Apple", "Orange", "Mango" }, "Title #2", "Let's mix some unrelated stuff.", 0, true));
-            fe.settingsList.Add(new SettingsItem(2, new List<string>() { "Cool", "Not Cool" }, "Title #3", "Easy choice!", 0, true));
+            fe.settingsList.Add(new SettingsItem(0, new List<string>() { "Wastelander", "Rat-Truck", "Bison", "Blazer" }, "Vehicle", "Choose a vehicle. This vehicle will be used for when you are on the runners team.", 0, true, 0, 0));
+            fe.settingsList.Add(new SettingsItem(1, new List<string>() { "West Coast", "Radio Los Santos", "Radio Off" }, "Radio Station", "Let's mix some unrelated stuff.", 0, true, 0, 0));
+            fe.settingsList.Add(new SettingsItem(2, new List<string>() { "" }, "Ready", "Mark yourself ready to play.", 0, true, 2, 116));
 
             fe.UpdateSettings();
 
@@ -181,7 +181,7 @@ namespace HuntersVsRunners
 
                     foreach (Player p in new PlayerList())
                     {
-                        fe.UpdatePlayer(p, p.ServerId, "WAITING", "SNAIL", PlayerIcon.GLOBE, HudColor.HUD_COLOUR_NET_PLAYER1_DARK, HudColor.HUD_COLOUR_MENU_GREEN);
+                        fe.UpdatePlayer(p, p.ServerId, "WAITING", "SNAIL", PlayerIcon.FREEMODE_RANK, HudColor.HUD_COLOUR_NET_PLAYER1_DARK, HudColor.HUD_COLOUR_MENU_GREEN);
                     }
                     updateTimer = GetGameTimer();
                 }
@@ -189,15 +189,15 @@ namespace HuntersVsRunners
                 HideHudAndRadarThisFrame();
                 ShowLoadingPrompt(1);
                 await Delay(0);
-                if (Game.IsControlJustPressed(0, Control.FrontendCancel))
-                {
-                    PushScaleformMovieFunctionN("SET_COLUMN_FOCUS");
-                    PushScaleformMovieFunctionParameterInt(0); // column index // _loc7_
-                    PushScaleformMovieFunctionParameterBool(true); // highlightIndex // _loc6_
-                    PushScaleformMovieFunctionParameterBool(false); // scriptSetUniqID // _loc4_
-                    PushScaleformMovieFunctionParameterBool(false); // scriptSetMenuState // _loc5_
-                    PopScaleformMovieFunctionVoid();
-                }
+                //if (Game.IsControlJustPressed(0, Control.FrontendCancel))
+                //{
+                //    PushScaleformMovieFunctionN("SET_COLUMN_FOCUS");
+                //    PushScaleformMovieFunctionParameterInt(0); // column index // _loc7_
+                //    PushScaleformMovieFunctionParameterBool(true); // highlightIndex // _loc6_
+                //    PushScaleformMovieFunctionParameterBool(false); // scriptSetUniqID // _loc4_
+                //    PushScaleformMovieFunctionParameterBool(false); // scriptSetMenuState // _loc5_
+                //    PopScaleformMovieFunctionVoid();
+                //}
                 //int sel = await fe.GetSelection();
 
                 //Debug.WriteLine(sel.ToString());
@@ -211,51 +211,58 @@ namespace HuntersVsRunners
         {
             if (Game.IsControlJustPressed(0, Control.FrontendRight))
             {
-                try
+                if (fe.settingsList[FeCurrentSelection].Type == 0)
                 {
-                    int sel = FeCurrentSelection;
-                    //Debug.WriteLine(FeCurrentSelection.ToString());
-                    int newIndex = fe.settingsList[sel].SelectedIndex + 1;
-                    if (newIndex >= fe.settingsList[sel].SelectionItems.Count)
+                    try
                     {
-                        newIndex = 0;
+                        int sel = FeCurrentSelection;
+                        //Debug.WriteLine(FeCurrentSelection.ToString());
+                        int newIndex = fe.settingsList[sel].SelectedIndex + 1;
+                        if (newIndex >= fe.settingsList[sel].SelectionItems.Count)
+                        {
+                            newIndex = 0;
+                        }
+                        //Debug.WriteLine(newIndex.ToString() + fe.settingsList[sel].SelectionItems[newIndex]);
+                        fe.settingsList[sel] = new SettingsItem(fe.settingsList[sel].RowIndex, fe.settingsList[sel].SelectionItems, fe.settingsList[sel].Title, fe.settingsList[sel].Description, newIndex, fe.settingsList[sel].Selectable, fe.settingsList[sel].Type, fe.settingsList[sel].RowColor);
+                        //Debug.WriteLine(fe.settingsList[sel].SelectedIndex.ToString() + fe.settingsList[sel].SelectionItems[newIndex]);
+                        //fe.settingsList[FeCurrentSelection].RowIndex
+                        await Delay(100);
+                        fe.UpdateSettings(true, sel);
                     }
-                    Debug.WriteLine(newIndex.ToString() + fe.settingsList[sel].SelectionItems[newIndex]);
-                    fe.settingsList[sel] = new SettingsItem(fe.settingsList[sel].RowIndex, fe.settingsList[sel].SelectionItems, fe.settingsList[sel].Title, fe.settingsList[sel].Description, newIndex, fe.settingsList[sel].Selectable);
-                    Debug.WriteLine(fe.settingsList[sel].SelectedIndex.ToString() + fe.settingsList[sel].SelectionItems[newIndex]);
-                    //fe.settingsList[FeCurrentSelection].RowIndex
-                    await Delay(100);
-                    fe.UpdateSettings(true, sel);
+                    catch (ArgumentOutOfRangeException e)
+                    {
+                        Debug.WriteLine(e.Message);
+                    }
+                    Game.PlaySound("NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET");
                 }
-                catch (ArgumentOutOfRangeException e)
-                {
-                    Debug.WriteLine(e.Message);
-                }
-                Game.PlaySound("NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET");
             }
             if (Game.IsControlJustPressed(0, Control.FrontendLeft))
             {
-                try
+                if (fe.settingsList[FeCurrentSelection].Type == 0)
                 {
-                    int sel = FeCurrentSelection;
-                    //Debug.WriteLine(FeCurrentSelection.ToString());
-                    int newIndex = fe.settingsList[sel].SelectedIndex - 1;
-                    if (newIndex < 0)
+                    try
                     {
-                        newIndex = fe.settingsList[sel].SelectionItems.Count - 1;
+                        int sel = FeCurrentSelection;
+                        //Debug.WriteLine(FeCurrentSelection.ToString());
+                        int newIndex = fe.settingsList[sel].SelectedIndex - 1;
+                        if (newIndex < 0)
+                        {
+                            newIndex = fe.settingsList[sel].SelectionItems.Count - 1;
+                        }
+                        //Debug.WriteLine(newIndex.ToString() + fe.settingsList[sel].SelectionItems[newIndex]);
+                        fe.settingsList[sel] = new SettingsItem(fe.settingsList[sel].RowIndex, fe.settingsList[sel].SelectionItems, fe.settingsList[sel].Title, fe.settingsList[sel].Description, newIndex, fe.settingsList[sel].Selectable, fe.settingsList[sel].Type, fe.settingsList[sel].RowColor);
+                        //Debug.WriteLine(fe.settingsList[sel].SelectedIndex.ToString() + fe.settingsList[sel].SelectionItems[newIndex]);
+                        //fe.settingsList[FeCurrentSelection].RowIndex
+                        await Delay(100);
+                        fe.UpdateSettings(true, sel);
                     }
-                    Debug.WriteLine(newIndex.ToString() + fe.settingsList[sel].SelectionItems[newIndex]);
-                    fe.settingsList[sel] = new SettingsItem(fe.settingsList[sel].RowIndex, fe.settingsList[sel].SelectionItems, fe.settingsList[sel].Title, fe.settingsList[sel].Description, newIndex, fe.settingsList[sel].Selectable);
-                    Debug.WriteLine(fe.settingsList[sel].SelectedIndex.ToString() + fe.settingsList[sel].SelectionItems[newIndex]);
-                    //fe.settingsList[FeCurrentSelection].RowIndex
-                    await Delay(100);
-                    fe.UpdateSettings(true, sel);
+                    catch (ArgumentOutOfRangeException e)
+                    {
+                        Debug.WriteLine(e.Message);
+                    }
+                    Game.PlaySound("NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET");
                 }
-                catch (ArgumentOutOfRangeException e)
-                {
-                    Debug.WriteLine(e.Message);
-                }
-                Game.PlaySound("NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET");
+
             }
 
             PushScaleformMovieFunctionN("SET_COLUMN_FOCUS");
