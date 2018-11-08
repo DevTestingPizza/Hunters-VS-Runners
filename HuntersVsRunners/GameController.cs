@@ -145,7 +145,7 @@ namespace HuntersVsRunners
 
             foreach (Player p in new PlayerList())
             {
-                fe.AddPlayer(p, p.ServerId, "WAITING", "SNAIL", PlayerIcon.FREEMODE_RANK, HudColor.HUD_COLOUR_NET_PLAYER1_DARK, HudColor.HUD_COLOUR_MENU_GREEN);
+                fe.AddPlayer(p, p.ServerId, "WAITING", "SNAIL", PlayerIcon.FREEMODE_RANK, HudColor.HUD_COLOUR_FREEMODE, HudColor.HUD_COLOUR_MENU_GREEN);
             }
 
             fe.SetDetailsMissionName("Map #1");
@@ -181,7 +181,7 @@ namespace HuntersVsRunners
 
                     foreach (Player p in new PlayerList())
                     {
-                        fe.UpdatePlayer(p, p.ServerId, "WAITING", "SNAIL", PlayerIcon.FREEMODE_RANK, HudColor.HUD_COLOUR_NET_PLAYER1_DARK, HudColor.HUD_COLOUR_MENU_GREEN);
+                        fe.UpdatePlayer(p, p.ServerId, "WAITING", "SNAIL", PlayerIcon.FREEMODE_RANK, HudColor.HUD_COLOUR_FREEMODE, HudColor.HUD_COLOUR_MENU_GREEN);
                     }
                     updateTimer = GetGameTimer();
                 }
