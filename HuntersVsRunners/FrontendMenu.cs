@@ -907,12 +907,14 @@ namespace HuntersVsRunners
 
         private void UpdateDetails()
         {
-            SetDetailsSlot(0, "Rating", "77.3%");
-            SetDetailsSlot(1, "Created By", "<C>Vespura</C>");
-            SetDetailsSlot(2, "Opens at Rank", "1");
-            SetDetailsSlot(3, "Players", "2-12");
-            SetDetailsSlot(4, "Type", "Hunters vs Runners");
-            SetDetailsSlot(5, "Distance", "6.25 km");
+            //SetDetailsSlot(0, GetLabelText("PM_TYPE"), "Hunters vs Runners");       // Type
+            SetDetailsSlot(0, GetLabelText("PM_RATING"), "77.3%");                  // Rating
+            SetDetailsSlot(1, GetLabelText("PM_CREATED"), "<C>Vespura</C>");        // Created by
+            //SetDetailsSlot(2, GetLabelText("PM_RANK"), "1");                      // Opens at Rank
+            SetDetailsSlot(2, GetLabelText("PM_PLAYERS"), "2-12");                  // Players
+            SetDetailsSlot(3, GetLabelText("PM_TEAMS"), "2");                       // Teams
+            SetDetailsSlot(4, GetLabelText("PM_AREA"), GetLabelText(GetNameOfZone(2321.30f, 3843.73f, 34.27f))); // Area
+            SetDetailsSlot(5, GetLabelText("FM_ISC_DIST"), "6.25 km");              // Distance
         }
 
         public void SetDetailsSlot(int row, string leftText, string rightText)
