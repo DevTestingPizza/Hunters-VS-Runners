@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FrontendMenu.cs" />
     <Compile Include="GfxController.cs" />
     <Compile Include="Hunter.cs" />
     <Compile Include="GameController.cs" />

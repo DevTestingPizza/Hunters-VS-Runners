@@ -23,6 +23,11 @@ namespace HuntersVsRunners
         private static Vehicle playerVehicle;
         private static bool firstTick = true;
         public static bool gameRestarting = false;
+        public static bool frontendActive = false;
+        public FrontendMenu fe = new FrontendMenu("Hunters VS Runners", FrontendType.FE_MENU_VERSION_CORONA);
+        public static int FeCurrentSelection = 0;
+
+        private static bool _ready = false;
 
 
         public struct CheckPoint
@@ -64,11 +69,16 @@ namespace HuntersVsRunners
         {
             //OnResourceStart();
             SetManualShutdownLoadingScreenNui(true);
+
+            EventHandlers.Add("hvr:ready", new Action(SetReady));
             EventHandlers.Add("onClientMapStart", new Action(OnResourceStart));
-            OnResourceStart();
+
+            Tick += FrontendSelectionManager;
+            Tick += FrontendSelectionManager2;
+            //OnResourceStart();
         }
 
-        private async void OnResourceStart()
+        private void OnResourceStart()
         {
             SetManualShutdownLoadingScreenNui(true);
 
@@ -87,19 +97,21 @@ namespace HuntersVsRunners
             Exports["spawnmanager"].setAutoSpawn(false);
             Exports["spawnmanager"].spawnPlayer(PlayerId() + 1, new Action(PlayerSpawned));
 
+
+
+        }
+
+        private void SetReady()
+        {
+            _ready = true;
         }
 
         private async void PlayerSpawned()
         {
-            //while (!IsScreenFadedOut())
-            //{
-            //    HideHudAndRadarThisFrame();
-            //    DoScreenFadeOut(0);
-            //    await Delay(0);
-            //}
-            //DoScreenFadeOut(100);
-            
-            DoScreenFadeOut(0);
+            if (!IsScreenFadedOut())
+            {
+                DoScreenFadeOut(0);
+            }
             SwitchOutPlayer(PlayerPedId(), 0, 1);
             while (GetPlayerSwitchState() < 5)
             {
@@ -120,9 +132,185 @@ namespace HuntersVsRunners
                 await Delay(0);
             }
 
+
+            AddTextEntry("hvr_loading_game", "Waiting for other players.");
+            SetLoadingPromptTextEntry("hvr_loading_game");
             StopAudioScene("MP_LEADERBOARD_SCENE");
-            await Delay(5000);
-            SwitchInPlayer(PlayerPedId());
+
+            fe.SetSubtitle("There are 2 teams. The ~r~HUNTERS~s~ and the ~b~RUNNERS~s~. ~n~The ~b~RUNNERS~s~ will have to race to the finish line, while the ~r~HUNTERS~s~ try to take them out.");
+
+            fe.SetColumnTitle(1, $"PLAYERS - ~1~", NetworkGetNumConnectedPlayers());
+
+            fe.SetDetailsMissionName("Map #1");
+
+            foreach (Player p in new PlayerList())
+            {
+                fe.AddPlayer(p, p.ServerId, "WAITING", "SNAIL", PlayerIcon.GLOBE, HudColor.HUD_COLOUR_NET_PLAYER1_DARK, HudColor.HUD_COLOUR_MENU_GREEN);
+            }
+
+            fe.SetDetailsMissionName("Map #1");
+
+            fe.settingsList.Add(new SettingsItem(0, new List<string>() { "Option One", "Option Two", "Option Three" }, "Title #1", "Choose an option!", 0, true));
+            fe.settingsList.Add(new SettingsItem(1, new List<string>() { "Apple", "Orange", "Mango" }, "Title #2", "Let's mix some unrelated stuff.", 0, true));
+            fe.settingsList.Add(new SettingsItem(2, new List<string>() { "Cool", "Not Cool" }, "Title #3", "Easy choice!", 0, true));
+
+            fe.UpdateSettings();
+
+            await fe.ToggleMenu();
+
+
+            frontendActive = true;
+
+            int updateTimer = GetGameTimer();
+
+            while (!AreWeReadyToStart())
+            {
+                if (GetGameTimer() - updateTimer > 500)
+                {
+                    fe.SetDetailsMissionName("Map #1");
+
+                    //PushScaleformMovieFunctionN("DISPLAY_DATA_SLOT");
+                    //PushScaleformMovieFunctionParameterInt(1);
+                    //PopScaleformMovieFunctionVoid();
+
+                    fe.SetColumnTitle(1, $"PLAYERS - ~1~", NetworkGetNumConnectedPlayers());
+
+                    //PushScaleformMovieFunctionN("DISPLAY_DATA_SLOT");
+                    //PushScaleformMovieFunctionParameterInt(3);
+                    //PopScaleformMovieFunctionVoid();
+
+                    foreach (Player p in new PlayerList())
+                    {
+                        fe.UpdatePlayer(p, p.ServerId, "WAITING", "SNAIL", PlayerIcon.GLOBE, HudColor.HUD_COLOUR_NET_PLAYER1_DARK, HudColor.HUD_COLOUR_MENU_GREEN);
+                    }
+                    updateTimer = GetGameTimer();
+                }
+                SetCloudHatOpacity(0.002f);
+                HideHudAndRadarThisFrame();
+                ShowLoadingPrompt(1);
+                await Delay(0);
+                if (Game.IsControlJustPressed(0, Control.FrontendCancel))
+                {
+                    PushScaleformMovieFunctionN("SET_COLUMN_FOCUS");
+                    PushScaleformMovieFunctionParameterInt(0); // column index // _loc7_
+                    PushScaleformMovieFunctionParameterBool(true); // highlightIndex // _loc6_
+                    PushScaleformMovieFunctionParameterBool(false); // scriptSetUniqID // _loc4_
+                    PushScaleformMovieFunctionParameterBool(false); // scriptSetMenuState // _loc5_
+                    PopScaleformMovieFunctionVoid();
+                }
+                //int sel = await fe.GetSelection();
+
+                //Debug.WriteLine(sel.ToString());
+            }
+
+            await fe.ToggleMenu();
+            frontendActive = false;
+        }
+
+        private async Task FrontendSelectionManager2()
+        {
+            if (Game.IsControlJustPressed(0, Control.FrontendRight))
+            {
+                try
+                {
+                    int sel = FeCurrentSelection;
+                    //Debug.WriteLine(FeCurrentSelection.ToString());
+                    int newIndex = fe.settingsList[sel].SelectedIndex + 1;
+                    if (newIndex >= fe.settingsList[sel].SelectionItems.Count)
+                    {
+                        newIndex = 0;
+                    }
+                    Debug.WriteLine(newIndex.ToString() + fe.settingsList[sel].SelectionItems[newIndex]);
+                    fe.settingsList[sel] = new SettingsItem(fe.settingsList[sel].RowIndex, fe.settingsList[sel].SelectionItems, fe.settingsList[sel].Title, fe.settingsList[sel].Description, newIndex, fe.settingsList[sel].Selectable);
+                    Debug.WriteLine(fe.settingsList[sel].SelectedIndex.ToString() + fe.settingsList[sel].SelectionItems[newIndex]);
+                    //fe.settingsList[FeCurrentSelection].RowIndex
+                    await Delay(100);
+                    fe.UpdateSettings(true, sel);
+                }
+                catch (ArgumentOutOfRangeException e)
+                {
+                    Debug.WriteLine(e.Message);
+                }
+                Game.PlaySound("NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET");
+            }
+            if (Game.IsControlJustPressed(0, Control.FrontendLeft))
+            {
+                try
+                {
+                    int sel = FeCurrentSelection;
+                    //Debug.WriteLine(FeCurrentSelection.ToString());
+                    int newIndex = fe.settingsList[sel].SelectedIndex - 1;
+                    if (newIndex < 0)
+                    {
+                        newIndex = fe.settingsList[sel].SelectionItems.Count - 1;
+                    }
+                    Debug.WriteLine(newIndex.ToString() + fe.settingsList[sel].SelectionItems[newIndex]);
+                    fe.settingsList[sel] = new SettingsItem(fe.settingsList[sel].RowIndex, fe.settingsList[sel].SelectionItems, fe.settingsList[sel].Title, fe.settingsList[sel].Description, newIndex, fe.settingsList[sel].Selectable);
+                    Debug.WriteLine(fe.settingsList[sel].SelectedIndex.ToString() + fe.settingsList[sel].SelectionItems[newIndex]);
+                    //fe.settingsList[FeCurrentSelection].RowIndex
+                    await Delay(100);
+                    fe.UpdateSettings(true, sel);
+                }
+                catch (ArgumentOutOfRangeException e)
+                {
+                    Debug.WriteLine(e.Message);
+                }
+                Game.PlaySound("NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET");
+            }
+
+            PushScaleformMovieFunctionN("SET_COLUMN_FOCUS");
+            PushScaleformMovieFunctionParameterInt(0); // column index // _loc7_
+            PushScaleformMovieFunctionParameterBool(true); // highlightIndex // _loc6_
+            PushScaleformMovieFunctionParameterBool(false); // scriptSetUniqID // _loc4_
+            PushScaleformMovieFunctionParameterBool(false); // scriptSetMenuState // _loc5_
+            PopScaleformMovieFunctionVoid();
+        }
+        private async Task FrontendSelectionManager()
+        {
+            if (frontendActive)
+            {
+
+                int tmpSelection = await fe.GetSelection();
+                if (tmpSelection == -1)
+                {
+                    return;
+                }
+                if (tmpSelection != FeCurrentSelection)
+                {
+                    fe.UpdateSettings();
+                    try
+                    {
+                        if (fe.settingsList != null && fe.settingsList.Count > tmpSelection)
+                        {
+                            //Debug.WriteLine(tmpSelection.ToString());
+                            //if (fe.settingsList.Count >= )
+                            await Delay(0);
+                            fe.SetSettingsCurrentDescription(fe.settingsList[tmpSelection].Description, false);
+                        }
+                        else
+                        {
+                            await Delay(0);
+                            fe.SetSettingsCurrentDescription("", false);
+                        }
+                    }
+                    catch (ArgumentOutOfRangeException e)
+                    {
+                        Debug.WriteLine(e.Message);
+                    }
+
+                    FeCurrentSelection = tmpSelection;
+                }
+
+            }
+        }
+
+        public static bool AreWeReadyToStart()
+        {
+            if (_ready)
+            {
+                return true;
+            }
+            return false;
         }
 
         /*
