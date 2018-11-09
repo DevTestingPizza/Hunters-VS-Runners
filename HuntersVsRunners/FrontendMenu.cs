@@ -434,11 +434,11 @@ namespace HuntersVsRunners
             {
                 if (playerRows.Any(Row => Row.Player == p))
                 {
-                    UpdatePlayer(p, p.ServerId, "WAITING", "SNAIL", PlayerIcon.FREEMODE_RANK, HudColor.HUD_COLOUR_FREEMODE, HudColor.HUD_COLOUR_MENU_GREEN);
+                    UpdatePlayer(p, p.ServerId, "JOINED", "SNAIL", PlayerIcon.FREEMODE_RANK, HudColor.HUD_COLOUR_FREEMODE, HudColor.HUD_COLOUR_GREEN);
                 }
                 else
                 {
-                    AddPlayer(p, p.ServerId, "WAITING", "SNAIL", PlayerIcon.FREEMODE_RANK, HudColor.HUD_COLOUR_FREEMODE, HudColor.HUD_COLOUR_MENU_GREEN);
+                    AddPlayer(p, p.ServerId, "JOINED", "SNAIL", PlayerIcon.FREEMODE_RANK, HudColor.HUD_COLOUR_FREEMODE, HudColor.HUD_COLOUR_GREEN);
                 }
             }
             await BaseScript.Delay(0);
@@ -790,11 +790,34 @@ namespace HuntersVsRunners
             //SetSettingsSlot(10, "info #6", "", false, 10);
 
             //SetSettingsCurrentDescription("This is a description for an option. It does not live update so you have to do this yourself somehow.", false);
+            //if (update && row == 1)
+            //{
+            //    if (settingsList[1].SelectedIndex)
+            //}
             if (update && row != -1)
             {
                 var s = settingsList[row];
                 SetSettingsSlot(s.RowIndex, s.Title, s.SelectionItems[s.SelectedIndex], s.Selectable, s.Type, s.RowColor);
-                Debug.WriteLine(s.SelectedIndex.ToString());
+                if (row == 1)
+                {
+                    if (s.SelectedIndex == 0)
+                    {
+                        SoundController.TriggerSuspenseMusicEvent();
+                    }
+                    else
+                    {
+                        SoundController.ResetMusicEvents();
+                    }
+
+                }
+                if (row == 0)
+                {
+                    SetSettingsSlotVehicleInfo(3, "Speed", 0.2f * (s.SelectedIndex + 1));
+                    SetSettingsSlotVehicleInfo(4, "Acceleration", 0.12f * (s.SelectedIndex + 1));
+                    SetSettingsSlotVehicleInfo(5, "Traction", 0.16f * (s.SelectedIndex + 1));
+                    SetSettingsSlotVehicleInfo(6, "Breaking", 0.21f * (s.SelectedIndex + 1));
+                }
+                //Debug.WriteLine(s.SelectedIndex.ToString());
             }
             else
             {
@@ -803,6 +826,12 @@ namespace HuntersVsRunners
                     SetSettingsSlot(s.RowIndex, s.Title, s.SelectionItems[s.SelectedIndex], s.Selectable, s.Type, s.RowColor);
                     //Debug.WriteLine(s.SelectionItems[s.SelectedIndex]);
                 }
+
+                
+                SetSettingsSlotVehicleInfo(3, "Speed", 0.2f * (settingsList[3].SelectedIndex + 1));
+                SetSettingsSlotVehicleInfo(4, "Acceleration", 0.12f * (settingsList[3].SelectedIndex + 1));
+                SetSettingsSlotVehicleInfo(5, "Traction", 0.16f * (settingsList[3].SelectedIndex + 1));
+                SetSettingsSlotVehicleInfo(6, "Breaking", 0.21f * (settingsList[3].SelectedIndex + 1));
             }
 
 
@@ -854,6 +883,51 @@ namespace HuntersVsRunners
             {
                 PushScaleformMovieFunctionParameterInt(0);
             }
+
+
+            //PushScaleformMovieFunctionParameterBool(false); // reduce colors
+
+            PushScaleformMovieFunctionParameterBool(false); // SOMETHING WITH ROCKSTAR/STAR LOGO SWITCHING.
+            ///// FINISH.
+            PopScaleformMovieFunctionVoid();
+        }
+
+        public void SetSettingsSlotVehicleInfo(int row, string leftText, float value)
+        {
+            ///// COLUMN 0 (LEFT) - ROW 1
+            PushScaleformMovieFunctionN("SET_DATA_SLOT");
+            PushScaleformMovieFunctionParameterInt(0); // column
+            PushScaleformMovieFunctionParameterInt(row); // index
+
+            // com.rockstargames.gtav.pauseMenu.pauseMenuItems.PauseMenuBaseItem::__set__data
+            PushScaleformMovieFunctionParameterInt(0); // menu ID 0
+            PushScaleformMovieFunctionParameterInt(0); // unique ID 0
+            PushScaleformMovieFunctionParameterInt(3); // type 0
+
+            //if (type != 0)
+            //{
+            //PushScaleformMovieFunctionParameterInt(28); // initialIndex 0 (right thing color)
+            //}
+            //else
+            //{
+            PushScaleformMovieFunctionParameterInt(0); // initialIndex 0 (right thing color)
+            //}
+
+            PushScaleformMovieFunctionParameterBool(false); // isSelectable true
+
+            PushScaleformMovieFunctionParameterString(leftText);
+
+
+            PushScaleformMovieFunctionParameterInt(0);
+
+            ///// UNSURE HOW THIS WORKS, BUT IF YOU UNCOMMENT THIS, IT'LL ADD AN ICON TO THE ROW.
+            ///// MAKING THE STRING "20" AND THE BOOL TRUE SEEMS TO DO SOMETHING WITH A ROCKSTAR LOGO INSTEAD.
+            PushScaleformMovieFunctionParameterInt(0);
+            PushScaleformMovieFunctionParameterString("");
+
+
+            PushScaleformMovieFunctionParameterInt(0);
+            PushScaleformMovieMethodParameterFloat(value);
 
 
             //PushScaleformMovieFunctionParameterBool(false); // reduce colors

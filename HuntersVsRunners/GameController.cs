@@ -122,13 +122,20 @@ namespace HuntersVsRunners
 
             StopAudioScene("MP_LEADERBOARD_SCENE");
 
+            SoundController.TriggerSuspenseMusicEvent();
+
             fe.SetSubtitle("There are 2 teams. The ~r~HUNTERS~s~ and the ~b~RUNNERS~s~. The ~b~RUNNERS~s~ will have to race to the finish line, while the ~r~HUNTERS~s~ try to take them out.");
 
             fe.settingsList.Add(new SettingsItem(0, new List<string>() { "Wastelander", "Rat-Truck", "Bison", "Blazer" }, "Vehicle", "Choose a vehicle. This vehicle will be used for when you are on the runners team.", 0, true, 0, 0));
-            fe.settingsList.Add(new SettingsItem(1, new List<string>() { "West Coast", "Radio Los Santos", "Radio Off" }, "Radio Station", "Let's mix some unrelated stuff.", 0, true, 0, 0));
+            fe.settingsList.Add(new SettingsItem(1, new List<string>() { "On", "Off" }, "Menu Music", "Tired of the music yet?", 0, true, 0, 0));
             fe.settingsList.Add(new SettingsItem(2, new List<string>() { "" }, "Ready", "Mark yourself ready to play.", 0, true, 2, 116));
-
+            fe.settingsList.Add(new SettingsItem(3, new List<string>() { "" }, "Speed", "", 0, false, 3, 60));
+            fe.settingsList.Add(new SettingsItem(4, new List<string>() { "" }, "Acceleration", "", 0, false, 3, 40));
+            fe.settingsList.Add(new SettingsItem(5, new List<string>() { "" }, "Breaking", "", 0, false, 3, 20));
+            fe.settingsList.Add(new SettingsItem(5, new List<string>() { "" }, "Traction", "", 0, false, 3, 20));
             fe.UpdateSettings();
+            
+            
 
             await fe.ToggleMenu();
 
@@ -201,6 +208,7 @@ namespace HuntersVsRunners
                         //fe.settingsList[FeCurrentSelection].RowIndex
                         await Delay(100);
                         fe.UpdateSettings(true, sel);
+                        
                     }
                     catch (ArgumentOutOfRangeException e)
                     {
@@ -209,6 +217,12 @@ namespace HuntersVsRunners
                     Game.PlaySound("NAV_LEFT_RIGHT", "HUD_FRONTEND_DEFAULT_SOUNDSET");
                 }
 
+            }
+
+            if (Game.IsControlJustPressed(0, Control.FrontendSelect))
+            {
+                //if (FeCurrentSelection)
+                Game.PlaySound("NAV_SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET");
             }
 
             PushScaleformMovieFunctionN("SET_COLUMN_FOCUS");
