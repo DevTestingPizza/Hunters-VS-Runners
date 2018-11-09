@@ -427,7 +427,7 @@ namespace HuntersVsRunners
         #region main public functions
         public async void UpdatePlayers()
         {
-            SetColumnTitle(1, $"PLAYERS - ~1~ OF 2-12", NetworkGetNumConnectedPlayers());
+            SetColumnTitle(1, $"PLAYERS ~1~ OF 2-12", NetworkGetNumConnectedPlayers());
 
             PlayerList list = new PlayerList();
             foreach (Player p in list)
@@ -667,7 +667,7 @@ namespace HuntersVsRunners
 
 
 
-                await SetDetailsMissionName("Hunters VS Runners", "", "");
+                await SetDetailsMissionName("Hunters VS Runners", null, null);
                 await BaseScript.Delay(100);
                 UpdateDetails();
                 await BaseScript.Delay(100);
@@ -692,6 +692,8 @@ namespace HuntersVsRunners
                 PushScaleformMovieFunctionParameterBool(true); // scriptSetUniqID // _loc4_
                 PushScaleformMovieFunctionParameterBool(true); // scriptSetMenuState // _loc5_
                 PopScaleformMovieFunctionVoid();
+                //SetFrontendRadioActive(true);
+                SoundController.TriggerSuspenseMusicEvent();
             }
             else
             {
@@ -722,18 +724,15 @@ namespace HuntersVsRunners
 
         public void SetColumnTitle(int column, string title, int thing)
         {
-            BeginScaleformMovieMethodV("SET_MENU_HEADER_TEXT_BY_INDEX");
+            BeginScaleformMovieMethodN("SET_MENU_HEADER_TEXT_BY_INDEX");
             PushScaleformMovieFunctionParameterInt(column);
-            AddTextEntry($"fe_col_title", title);
-            BeginTextCommandScaleformString($"fe_col_title");
+            AddTextEntry("fe_col_title", title);
+            BeginTextCommandScaleformString("fe_col_title");
             AddTextComponentInteger(thing);
-            //AddTextComponentInteger(0);
-            //AddTextComponentInteger(0);
             EndTextCommandScaleformString();
             PushScaleformMovieFunctionParameterInt(0);
             PushScaleformMovieFunctionParameterBool(false);
-            EndScaleformMovieMethod();
-
+            PopScaleformMovieFunctionVoid();
         }
 
         public async Task SetDetailsMissionName(string name, string rp, string cash, string textureDict = "prop_screen_nhp_base3", string textureName = "3_2_prep_01")
