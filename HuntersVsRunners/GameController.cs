@@ -11,20 +11,21 @@ namespace HuntersVsRunners
 {
     public class GameController : BaseScript
     {
-        private static int progress = 0; // # of checkpoints reached.
+        //private static int progress = 0; // # of checkpoints reached.
         public static int team = 0; // 0 = nothing yet, 1 = runner, 2 = hunter, 3 = spectator/dead.
-        private static int hunters = 1;
-        private static int runners = 1;
-        private static int minutes = 0;
-        private static int seconds = 0;
-        private static int gameTime = 0;
-        private static string gameTimeString = "00:00";
-        private static bool gameTimeRunning = false;
-        private static Vehicle playerVehicle;
-        private static bool firstTick = true;
+        //private static int hunters = 1;
+        //private static int runners = 1;
+        //private static int minutes = 0;
+        //private static int seconds = 0;
+        //private static int gameTime = 0;
+        //private static string gameTimeString = "00:00";
+        //private static bool gameTimeRunning = false;
+        //private static Vehicle playerVehicle;
+        //private static bool firstTick = true;
         public static bool gameRestarting = false;
         public static bool frontendActive = false;
         public FrontendMenu fe = new FrontendMenu("Hunters VS Runners", FrontendType.FE_MENU_VERSION_CORONA);
+        //private static Scaleform instr_btn_scale = new Scaleform("instructional_buttons");
         public static int FeCurrentSelection = 0;
 
         private static bool _ready = false;
@@ -47,14 +48,14 @@ namespace HuntersVsRunners
         {
             new CheckPoint(){ Location = new Vector3(  2533.77f, 4888.76f,  36.74f ), Red = 255, Green = 255, Blue = 0, Alpha = 150, Type = 0, Id = 0 },
             new CheckPoint(){ Location = new Vector3(  2551.54f, 4607.26f,  32.50f ), Red = 255, Green = 255, Blue = 0, Alpha = 150, Type = 0, Id = 1 },
-            new CheckPoint(){ Location = new Vector3(  2321.30f, 3843.73f,  34.27f ), Red = 255, Green = 255, Blue = 0, Alpha = 150, Type = 4, Id = 2 },
-            //new CheckPoint(){ Location = new Vector3(  2228.99f, 3248.18f,  47.34f ), Red = 255, Green = 255, Blue = 0, Alpha = 150, Type = 0, Id = 3 },
-            //new CheckPoint(){ Location = new Vector3(  1347.14f, 2962.53f,  40.12f ), Red = 255, Green = 255, Blue = 0, Alpha = 150, Type = 0, Id = 4 },
-            //new CheckPoint(){ Location = new Vector3(   506.50f, 3067.66f,  39.99f ), Red = 255, Green = 255, Blue = 0, Alpha = 150, Type = 0, Id = 5 },
-            //new CheckPoint(){ Location = new Vector3(   199.67f, 3112.23f,  41.33f ), Red = 255, Green = 255, Blue = 0, Alpha = 150, Type = 0, Id = 6 },
-            //new CheckPoint(){ Location = new Vector3(  -162.39f, 2964.99f,  31.87f ), Red = 255, Green = 255, Blue = 0, Alpha = 150, Type = 0, Id = 7 },
-            //new CheckPoint(){ Location = new Vector3( -1438.65f, 2148.70f,  53.14f ), Red = 255, Green = 255, Blue = 0, Alpha = 150, Type = 0, Id = 8 },
-            //new CheckPoint(){ Location = new Vector3( -1542.50f, 1372.70f, 124.75f ), Red = 255, Green = 255, Blue = 0, Alpha = 150, Type = 4, Id = 9 },
+            new CheckPoint(){ Location = new Vector3(  2321.30f, 3843.73f,  34.27f ), Red = 255, Green = 255, Blue = 0, Alpha = 150, Type = 0, Id = 2 },
+            new CheckPoint(){ Location = new Vector3(  2228.99f, 3248.18f,  47.34f ), Red = 255, Green = 255, Blue = 0, Alpha = 150, Type = 0, Id = 3 },
+            new CheckPoint(){ Location = new Vector3(  1347.14f, 2962.53f,  40.12f ), Red = 255, Green = 255, Blue = 0, Alpha = 150, Type = 0, Id = 4 },
+            new CheckPoint(){ Location = new Vector3(   506.50f, 3067.66f,  39.99f ), Red = 255, Green = 255, Blue = 0, Alpha = 150, Type = 0, Id = 5 },
+            new CheckPoint(){ Location = new Vector3(   199.67f, 3112.23f,  41.33f ), Red = 255, Green = 255, Blue = 0, Alpha = 150, Type = 0, Id = 6 },
+            new CheckPoint(){ Location = new Vector3(  -162.39f, 2964.99f,  31.87f ), Red = 255, Green = 255, Blue = 0, Alpha = 150, Type = 0, Id = 7 },
+            new CheckPoint(){ Location = new Vector3( -1438.65f, 2148.70f,  53.14f ), Red = 255, Green = 255, Blue = 0, Alpha = 150, Type = 0, Id = 8 },
+            new CheckPoint(){ Location = new Vector3( -1542.50f, 1372.70f, 124.75f ), Red = 255, Green = 255, Blue = 0, Alpha = 150, Type = 4, Id = 9 },
         };
 
         //public readonly uint runner_veh_hash = (uint)GetHashKey("ratloader2");
@@ -67,7 +68,6 @@ namespace HuntersVsRunners
         /// </summary>
         public GameController()
         {
-            //OnResourceStart();
             SetManualShutdownLoadingScreenNui(true);
 
             EventHandlers.Add("hvr:ready", new Action(SetReady));
@@ -75,30 +75,14 @@ namespace HuntersVsRunners
 
             Tick += FrontendSelectionManager;
             Tick += FrontendSelectionManager2;
-            //OnResourceStart();
         }
 
         private void OnResourceStart()
         {
             SetManualShutdownLoadingScreenNui(true);
-
-
-            //DoScreenFadeOut(0);
-
-
-
-
             StartAudioScene("MP_LEADERBOARD_SCENE");
-
-
-
-
-            //ResurrectPed(PlayerPedId());
             Exports["spawnmanager"].setAutoSpawn(false);
             Exports["spawnmanager"].spawnPlayer(PlayerId() + 1, new Action(PlayerSpawned));
-
-
-
         }
 
         private void SetReady()
@@ -135,14 +119,10 @@ namespace HuntersVsRunners
 
             AddTextEntry("hvr_loading_game", "Waiting for other players.");
             SetLoadingPromptTextEntry("hvr_loading_game");
+
             StopAudioScene("MP_LEADERBOARD_SCENE");
 
             fe.SetSubtitle("There are 2 teams. The ~r~HUNTERS~s~ and the ~b~RUNNERS~s~. The ~b~RUNNERS~s~ will have to race to the finish line, while the ~r~HUNTERS~s~ try to take them out.");
-
-            //foreach (Player p in new PlayerList())
-            //{
-            //    fe.AddPlayer(p, p.ServerId, "WAITING", "SNAIL", PlayerIcon.FREEMODE_RANK, HudColor.HUD_COLOUR_FREEMODE, HudColor.HUD_COLOUR_MENU_GREEN);
-            //}
 
             fe.settingsList.Add(new SettingsItem(0, new List<string>() { "Wastelander", "Rat-Truck", "Bison", "Blazer" }, "Vehicle", "Choose a vehicle. This vehicle will be used for when you are on the runners team.", 0, true, 0, 0));
             fe.settingsList.Add(new SettingsItem(1, new List<string>() { "West Coast", "Radio Los Santos", "Radio Off" }, "Radio Station", "Let's mix some unrelated stuff.", 0, true, 0, 0));
@@ -152,43 +132,26 @@ namespace HuntersVsRunners
 
             await fe.ToggleMenu();
 
-
             frontendActive = true;
 
             int updateTimer = GetGameTimer();
 
             while (!AreWeReadyToStart())
             {
-                if (GetGameTimer() - updateTimer > 1000)
+                if (GetGameTimer() - updateTimer > 500)
                 {
                     fe.UpdatePlayers();
-                    //foreach (Player p in new PlayerList())
-                    //{
-                    //    fe.UpdatePlayer(p, p.ServerId, "WAITING", "SNAIL", PlayerIcon.FREEMODE_RANK, HudColor.HUD_COLOUR_FREEMODE, HudColor.HUD_COLOUR_MENU_GREEN);
-                    //}
                     updateTimer = GetGameTimer();
                 }
                 SetCloudHatOpacity(0.002f);
-                HideHudAndRadarThisFrame();
                 ShowLoadingPrompt(1);
                 await Delay(0);
-                //if (Game.IsControlJustPressed(0, Control.FrontendCancel))
-                //{
-                //    PushScaleformMovieFunctionN("SET_COLUMN_FOCUS");
-                //    PushScaleformMovieFunctionParameterInt(0); // column index // _loc7_
-                //    PushScaleformMovieFunctionParameterBool(true); // highlightIndex // _loc6_
-                //    PushScaleformMovieFunctionParameterBool(false); // scriptSetUniqID // _loc4_
-                //    PushScaleformMovieFunctionParameterBool(false); // scriptSetMenuState // _loc5_
-                //    PopScaleformMovieFunctionVoid();
-                //}
-                //int sel = await fe.GetSelection();
-
-                //Debug.WriteLine(sel.ToString());
             }
 
             await fe.ToggleMenu();
             frontendActive = false;
         }
+
 
         private async Task FrontendSelectionManager2()
         {
@@ -273,8 +236,6 @@ namespace HuntersVsRunners
                     {
                         if (fe.settingsList != null && fe.settingsList.Count > tmpSelection)
                         {
-                            //Debug.WriteLine(tmpSelection.ToString());
-                            //if (fe.settingsList.Count >= )
                             await Delay(0);
                             fe.SetSettingsCurrentDescription(fe.settingsList[tmpSelection].Description, false);
                         }
