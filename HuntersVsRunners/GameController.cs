@@ -23,10 +23,11 @@ namespace HuntersVsRunners
         //private static Vehicle playerVehicle;
         //private static bool firstTick = true;
         public static bool gameRestarting = false;
-        public static bool frontendActive = false;
+        //public static bool frontendActive = false;
         public FrontendMenu fe = new FrontendMenu("Hunters VS Runners", FrontendType.FE_MENU_VERSION_CORONA);
         //private static Scaleform instr_btn_scale = new Scaleform("instructional_buttons");
         public static int FeCurrentSelection = 0;
+        public static int GameState { get; private set; } = 0;
 
         private static bool _ready = false;
 
@@ -72,9 +73,15 @@ namespace HuntersVsRunners
 
             EventHandlers.Add("hvr:ready", new Action(SetReady));
             EventHandlers.Add("onClientMapStart", new Action(OnResourceStart));
+            EventHandlers.Add("hvsr:setGameState", new Action<int>(SetGamePhase));
 
             Tick += FrontendSelectionManager;
             Tick += FrontendSelectionManager2;
+        }
+
+        private void SetGamePhase(int phase)
+        {
+            GameState = phase;
         }
 
         private void OnResourceStart()
@@ -82,7 +89,7 @@ namespace HuntersVsRunners
             SetManualShutdownLoadingScreenNui(true);
             StartAudioScene("MP_LEADERBOARD_SCENE");
             Exports["spawnmanager"].setAutoSpawn(false);
-            Exports["spawnmanager"].spawnPlayer(PlayerId() + 1, new Action(PlayerSpawned));
+            Exports["spawnmanager"].spawnPlayer(PlayerId() + 1, new Action(FirstPlayerSpawn));
         }
 
         private void SetReady()
@@ -90,7 +97,7 @@ namespace HuntersVsRunners
             _ready = true;
         }
 
-        private async void PlayerSpawned()
+        private async void FirstPlayerSpawn()
         {
             if (!IsScreenFadedOut())
             {
@@ -116,9 +123,22 @@ namespace HuntersVsRunners
                 await Delay(0);
             }
 
+            if (GameState == 0)
+            {
+                AddTextEntry("hvr_loading_game", "Waiting for players.");
+                SetLoadingPromptTextEntry("hvr_loading_game");
+            }
+            else if (GameState == 1)
+            {
+                AddTextEntry("hvr_loading_game", "Loading new round.");
+                SetLoadingPromptTextEntry("hvr_loading_game");
+            }
+            else
+            {
+                AddTextEntry("hvr_loading_game", "Loading.");
+                SetLoadingPromptTextEntry("hvr_loading_game");
+            }
 
-            AddTextEntry("hvr_loading_game", "Waiting for other players.");
-            SetLoadingPromptTextEntry("hvr_loading_game");
 
             StopAudioScene("MP_LEADERBOARD_SCENE");
 
@@ -134,34 +154,51 @@ namespace HuntersVsRunners
             fe.settingsList.Add(new SettingsItem(5, new List<string>() { "" }, "Breaking", "", 0, false, 3, 20));
             fe.settingsList.Add(new SettingsItem(5, new List<string>() { "" }, "Traction", "", 0, false, 3, 20));
             fe.UpdateSettings();
-            
-            
 
-            await fe.ToggleMenu();
 
-            frontendActive = true;
-
-            int updateTimer = GetGameTimer();
-
-            while (!AreWeReadyToStart())
+            if (GameState == 0 || GameState == 1)
             {
-                if (GetGameTimer() - updateTimer > 500)
+                SetFrontendActive(false);
+                while (IsFrontendFading() || IsPauseMenuActive() || IsPauseMenuRestarting())
                 {
-                    fe.UpdatePlayers();
-                    updateTimer = GetGameTimer();
+                    await Delay(0);
                 }
-                SetCloudHatOpacity(0.002f);
-                ShowLoadingPrompt(1);
-                await Delay(0);
+
+                await fe.ToggleMenu();
+
+                //frontendActive = true;
+
+                int updateTimer = GetGameTimer();
+
+                while (!AreWeReadyToStart())
+                {
+                    if (GetGameTimer() - updateTimer > 500)
+                    {
+                        fe.UpdatePlayers();
+                        updateTimer = GetGameTimer();
+                    }
+                    SetCloudHatOpacity(0.002f);
+                    ShowLoadingPrompt(1);
+
+                    await Delay(0);
+                }
+
+                await fe.ToggleMenu();
+                //frontendActive = false;
             }
 
-            await fe.ToggleMenu();
-            frontendActive = false;
+
+
         }
 
 
         private async Task FrontendSelectionManager2()
         {
+            //if (fe != null)
+            //{
+            //    //Debug.WriteLine(fe.IsVisible.ToString());
+            //}
+
             if (Game.IsControlJustPressed(0, Control.FrontendRight))
             {
                 if (fe.settingsList[FeCurrentSelection].Type == 0)
@@ -208,7 +245,7 @@ namespace HuntersVsRunners
                         //fe.settingsList[FeCurrentSelection].RowIndex
                         await Delay(100);
                         fe.UpdateSettings(true, sel);
-                        
+
                     }
                     catch (ArgumentOutOfRangeException e)
                     {
@@ -235,7 +272,7 @@ namespace HuntersVsRunners
 
         private async Task FrontendSelectionManager()
         {
-            if (frontendActive)
+            if (fe.IsVisible)
             {
 
                 int tmpSelection = await fe.GetSelection();
@@ -272,7 +309,7 @@ namespace HuntersVsRunners
 
         public static bool AreWeReadyToStart()
         {
-            if (_ready)
+            if (_ready || GameState >= 2)
             {
                 return true;
             }

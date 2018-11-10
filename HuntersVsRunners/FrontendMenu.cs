@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -365,7 +365,13 @@ namespace HuntersVsRunners
         #endregion
 
         #region public variables
-        public bool IsVisible { get; private set; }
+        public bool IsVisible
+        {
+            get
+            {
+                return (IsPauseMenuActive() || IsPauseMenuRestarting()) && GetCurrentFrontendMenu() == GetHashKey(Enum.GetName(typeof(FrontendType), menuType));
+            }
+        }
         #endregion
 
 
@@ -593,9 +599,13 @@ namespace HuntersVsRunners
 
         public async Task ToggleMenu()
         {
-            IsVisible = !IsVisible;
-            if (IsVisible)
+            //IsVisible = !IsVisible;
+            if (!IsVisible)
             {
+                if (IsPauseMenuActive() || IsPauseMenuRestarting() || IsFrontendFading())
+                {
+                    SetFrontendActive(false);
+                }
                 while (IsPauseMenuActive() || IsPauseMenuRestarting() || IsFrontendFading())
                 {
                     SetFrontendActive(false);
