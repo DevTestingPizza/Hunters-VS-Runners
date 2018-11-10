@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -822,26 +822,22 @@ namespace HuntersVsRunners
                 }
                 if (row == 0)
                 {
-                    SetSettingsSlotVehicleInfo(3, "Speed", 0.2f * (s.SelectedIndex + 1));
-                    SetSettingsSlotVehicleInfo(4, "Acceleration", 0.12f * (s.SelectedIndex + 1));
-                    SetSettingsSlotVehicleInfo(5, "Traction", 0.16f * (s.SelectedIndex + 1));
-                    SetSettingsSlotVehicleInfo(6, "Breaking", 0.21f * (s.SelectedIndex + 1));
+                    SetSettingsSlotVehicleInfo(settingsList.Count - 4, "Speed", GetStatFromSelectedVehicle(0, (uint)GetHashKey(GetSelectedVehicle())));
+                    SetSettingsSlotVehicleInfo(settingsList.Count - 3, "Acceleration", GetStatFromSelectedVehicle(1, (uint)GetHashKey(GetSelectedVehicle())));
+                    SetSettingsSlotVehicleInfo(settingsList.Count - 2, "Traction", GetStatFromSelectedVehicle(2, (uint)GetHashKey(GetSelectedVehicle())));
+                    SetSettingsSlotVehicleInfo(settingsList.Count - 1, "Breaking", GetStatFromSelectedVehicle(3, (uint)GetHashKey(GetSelectedVehicle())));
                 }
-                //Debug.WriteLine(s.SelectedIndex.ToString());
             }
             else
             {
                 foreach (var s in settingsList)
                 {
                     SetSettingsSlot(s.RowIndex, s.Title, s.SelectionItems[s.SelectedIndex], s.Selectable, s.Type, s.RowColor);
-                    //Debug.WriteLine(s.SelectionItems[s.SelectedIndex]);
                 }
-
-                
-                SetSettingsSlotVehicleInfo(3, "Speed", 0.2f * (settingsList[3].SelectedIndex + 1));
-                SetSettingsSlotVehicleInfo(4, "Acceleration", 0.12f * (settingsList[3].SelectedIndex + 1));
-                SetSettingsSlotVehicleInfo(5, "Traction", 0.16f * (settingsList[3].SelectedIndex + 1));
-                SetSettingsSlotVehicleInfo(6, "Breaking", 0.21f * (settingsList[3].SelectedIndex + 1));
+                SetSettingsSlotVehicleInfo(settingsList.Count - 4, "Speed", GetStatFromSelectedVehicle(0, (uint)GetHashKey(GetSelectedVehicle())));
+                SetSettingsSlotVehicleInfo(settingsList.Count - 3, "Acceleration", GetStatFromSelectedVehicle(1, (uint)GetHashKey(GetSelectedVehicle())));
+                SetSettingsSlotVehicleInfo(settingsList.Count - 2, "Traction", GetStatFromSelectedVehicle(2, (uint)GetHashKey(GetSelectedVehicle())));
+                SetSettingsSlotVehicleInfo(settingsList.Count - 1, "Breaking", GetStatFromSelectedVehicle(3, (uint)GetHashKey(GetSelectedVehicle())));
             }
 
 
@@ -849,6 +845,49 @@ namespace HuntersVsRunners
             PushScaleformMovieFunctionParameterInt(0);
             PopScaleformMovieFunctionVoid();
             SetSettingsCurrentDescription(settingsList[GameController.FeCurrentSelection].Description, false);
+        }
+
+        private string GetSelectedVehicle()
+        {
+            int index = settingsList[0].SelectedIndex;
+            if (index == 0)
+            {
+                return "wastelander";
+            }
+            else if (index == 1)
+            {
+                return "ratloader2";
+            }
+            else if (index == 2)
+            {
+                return "bison";
+            }
+            else if (index == 3)
+            {
+                return "blazer";
+            }
+            return "invalid";
+        }
+
+        private float GetStatFromSelectedVehicle(int statType, uint vehicleModel)
+        {
+            if (statType == 0)
+            {
+                return GetVehicleModelMaxSpeed(vehicleModel) / 70f;
+            }
+            else if (statType == 1)
+            {
+                return GetVehicleModelAcceleration(vehicleModel);
+            }
+            else if (statType == 2)
+            {
+                return GetVehicleModelMaxTraction(vehicleModel) / 2.5f;
+            }
+            else if (statType == 3)
+            {
+                return GetVehicleModelMaxBraking(vehicleModel);
+            }
+            return 0f;
         }
 
         private void SetSettingsSlot(int row, string leftText, string rightSomething, bool selectable, int type, int rowColor)
@@ -870,7 +909,7 @@ namespace HuntersVsRunners
             //else
             //{
             PushScaleformMovieFunctionParameterInt(0); // initialIndex 0 (right thing color)
-            //}
+                                                       //}
 
             PushScaleformMovieFunctionParameterBool(selectable); // isSelectable true
 
@@ -898,7 +937,7 @@ namespace HuntersVsRunners
             //PushScaleformMovieFunctionParameterBool(false); // reduce colors
 
             PushScaleformMovieFunctionParameterBool(false); // SOMETHING WITH ROCKSTAR/STAR LOGO SWITCHING.
-            ///// FINISH.
+                                                            ///// FINISH.
             PopScaleformMovieFunctionVoid();
         }
 
@@ -921,7 +960,7 @@ namespace HuntersVsRunners
             //else
             //{
             PushScaleformMovieFunctionParameterInt(0); // initialIndex 0 (right thing color)
-            //}
+                                                       //}
 
             PushScaleformMovieFunctionParameterBool(false); // isSelectable true
 
@@ -943,7 +982,7 @@ namespace HuntersVsRunners
             //PushScaleformMovieFunctionParameterBool(false); // reduce colors
 
             PushScaleformMovieFunctionParameterBool(false); // SOMETHING WITH ROCKSTAR/STAR LOGO SWITCHING.
-            ///// FINISH.
+                                                            ///// FINISH.
             PopScaleformMovieFunctionVoid();
         }
 
@@ -994,7 +1033,7 @@ namespace HuntersVsRunners
             //SetDetailsSlot(0, GetLabelText("PM_TYPE"), "Hunters vs Runners");       // Type
             SetDetailsSlot(0, GetLabelText("PM_RATING"), "77.3%");                  // Rating
             SetDetailsSlot(1, GetLabelText("PM_CREATED"), "<C>Vespura</C>");        // Created by
-            //SetDetailsSlot(2, GetLabelText("PM_RANK"), "1");                      // Opens at Rank
+                                                                                    //SetDetailsSlot(2, GetLabelText("PM_RANK"), "1");                      // Opens at Rank
             SetDetailsSlot(2, GetLabelText("PM_PLAYERS"), "2-12");                  // Players
             SetDetailsSlot(3, GetLabelText("PM_TEAMS"), "2");                       // Teams
             SetDetailsSlot(4, GetLabelText("PM_AREA"), GetLabelText(GetNameOfZone(2321.30f, 3843.73f, 34.27f))); // Area
