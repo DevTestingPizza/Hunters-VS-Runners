@@ -365,6 +365,9 @@ namespace HuntersVsRunners
         #endregion
 
         #region public variables
+        /// <summary>
+        /// Checks if this menu is visible. (Or another menu with the same hash for that matter, no good way to seperate this.
+        /// </summary>
         public bool IsVisible
         {
             get
@@ -403,6 +406,10 @@ namespace HuntersVsRunners
             return id;
         }
 
+        /// <summary>
+        /// Get the amount of player rows.
+        /// </summary>
+        /// <returns></returns>
         public int GetNumPlayerRows()
         {
             return playerRows.Count;
@@ -431,6 +438,9 @@ namespace HuntersVsRunners
 
 
         #region main public functions
+        /// <summary>
+        /// Update the player list.
+        /// </summary>
         public async void UpdatePlayers()
         {
             SetColumnTitle(1, $"PLAYERS ~1~ OF 2-12", NetworkGetNumConnectedPlayers());
@@ -466,6 +476,16 @@ namespace HuntersVsRunners
             }
         }
 
+        /// <summary>
+        /// Add a player row.
+        /// </summary>
+        /// <param name="player"></param>
+        /// <param name="rank"></param>
+        /// <param name="status"></param>
+        /// <param name="crewTag"></param>
+        /// <param name="icon"></param>
+        /// <param name="rowColor"></param>
+        /// <param name="statusColor"></param>
         public async void AddPlayer(Player player, int rank, string status, string crewTag, PlayerIcon icon, HudColor rowColor, HudColor statusColor)
         {
             if (!IsVisible)
@@ -477,6 +497,16 @@ namespace HuntersVsRunners
             await UpdateList();
         }
 
+        /// <summary>
+        /// Update a player row by index.
+        /// </summary>
+        /// <param name="index"></param>
+        /// <param name="rank"></param>
+        /// <param name="status"></param>
+        /// <param name="crewTag"></param>
+        /// <param name="icon"></param>
+        /// <param name="rowColor"></param>
+        /// <param name="statusColor"></param>
         public async void UpdatePlayer(int index, int rank, string status, string crewTag, PlayerIcon icon, HudColor rowColor, HudColor statusColor)
         {
             PlayerRow p = playerRows[index];
@@ -489,6 +519,16 @@ namespace HuntersVsRunners
             await UpdateList();
         }
 
+        /// <summary>
+        /// Update a player row from player source.
+        /// </summary>
+        /// <param name="player"></param>
+        /// <param name="rank"></param>
+        /// <param name="status"></param>
+        /// <param name="crewTag"></param>
+        /// <param name="icon"></param>
+        /// <param name="rowColor"></param>
+        /// <param name="statusColor"></param>
         public async void UpdatePlayer(Player player, int rank, string status, string crewTag, PlayerIcon icon, HudColor rowColor, HudColor statusColor)
         {
             PlayerRow p = playerRows.Find(pr => { return pr.Player.ServerId == player.ServerId; });
@@ -501,6 +541,10 @@ namespace HuntersVsRunners
             await UpdateList();
         }
 
+        /// <summary>
+        /// Delete a player row.
+        /// </summary>
+        /// <param name="index"></param>
         public async void DeletePlayer(int index)
         {
             playerRows.RemoveAt(index);
@@ -511,6 +555,10 @@ namespace HuntersVsRunners
             await UpdateList();
         }
 
+        /// <summary>
+        /// Updates the playerlist.
+        /// </summary>
+        /// <returns></returns>
         private async Task UpdateList()
         {
             //for (var i = 0; i < 32; i++)
@@ -593,81 +641,70 @@ namespace HuntersVsRunners
             PushScaleformMovieFunctionParameterBool(false); // scriptSetUniqID // _loc4_
             PushScaleformMovieFunctionParameterBool(false); // scriptSetMenuState // _loc5_
             PopScaleformMovieFunctionVoid();
-
-
         }
 
+        /// <summary>
+        /// Toggles the menu visibility and sets up all the necessary data for the menu.
+        /// </summary>
+        /// <returns></returns>
         public async Task ToggleMenu()
         {
-            //IsVisible = !IsVisible;
             if (!IsVisible)
             {
                 if (IsPauseMenuActive() || IsPauseMenuRestarting() || IsFrontendFading())
                 {
                     SetFrontendActive(false);
                 }
+
                 while (IsPauseMenuActive() || IsPauseMenuRestarting() || IsFrontendFading())
                 {
                     SetFrontendActive(false);
                     await BaseScript.Delay(0);
                 }
 
-                //RestartFrontendMenu(menuType == FrontendType.FE_MENU_VERSION_CORONA ? (uint)GetHashKey("FE_MENU_VERSION_CORONA") : (uint)GetHashKey("FE_MENU_VERSION_CORONA_RACE"), -1);
                 RestartFrontendMenu((uint)GetHashKey(menuType.ToString()), -1);
-
-                //AddFrontendMenuContext((uint)GetHashKey("FM_TUTORIAL"));
-                //AddFrontendMenuContext((uint)GetHashKey("AUTOFILL_CORONA"));
-                //AddFrontendMenuContext((uint)GetHashKey("CORONA_TOURNAMENT"));
-                //AddFrontendMenuContext((uint)GetHashKey("AUTOFILL_CONTINUE"));
-                //AddFrontendMenuContext((uint)GetHashKey("HUD_CASH_HEAD"));
-                //AddFrontendMenuContext(2010410515);
-                //ObjectDecalToggle((uint)Int64.Parse("-228602367"));
-
-                //ActivateFrontendMenu(menuType == FrontendType.FE_MENU_VERSION_CORONA ? (uint)GetHashKey("FE_MENU_VERSION_CORONA") : (uint)GetHashKey("FE_MENU_VERSION_CORONA_RACE"), false, -1);
                 ActivateFrontendMenu((uint)GetHashKey(menuType.ToString()), false, -1);
 
-                // start a call
+                // wait for it to start.
                 while (!IsPauseMenuActive() || IsPauseMenuRestarting())
                 {
                     await BaseScript.Delay(0);
                 }
 
-                //AddFrontendMenuContext((uint)GetHashKey("FM_TUTORIAL"));
-                //AddFrontendMenuContext((uint)GetHashKey("AUTOFILL_CORONA"));
-                //AddFrontendMenuContext((uint)GetHashKey("CORONA_TOURNAMENT"));
-                //AddFrontendMenuContext((uint)GetHashKey("AUTOFILL_CONTINUE"));
+                // don't use this: you'll regret it. It disables the navigation keys on keyboard. Not sure about controller.
+                // N_0xec9264727eec0f28(); this disables the key.s
+                // N_0x14621bb1df14e2b2(); this enables the keys again.
+
+                BeginScaleformMovieMethodV("SHOW_HEADING_DETAILS"); // stops ped info from showing up (top right of the screen)
+                PushScaleformMovieMethodParameterBool(false);       // also fixes the subtitle of the frontend menu from line-breaking really early.
+                PopScaleformMovieFunctionVoid();
 
 
-                BeginScaleformMovieMethodV("SHIFT_CORONA_DESC");       // start call function - BeginScaleformMovieMethodV
+                /// some weird stuff that needs more research
+                //BeginScaleformMovieMethodV("SET_ALL_HIGHLIGHTS");
+                //PushScaleformMovieMethodParameterBool(true);
+                //PushScaleformMovieMethodParameterInt(123);
+                //PopScaleformMovieFunctionVoid();
+
+
+                // move the header down and stuff.
+                BeginScaleformMovieMethodV("SHIFT_CORONA_DESC");        // start call function - BeginScaleformMovieMethodV
                 PushScaleformMovieFunctionParameterBool(true);          // push frontend title menu up.
                 PushScaleformMovieFunctionParameterBool(false);         // show extra top border line
-                PopScaleformMovieFunction();                        // end call function
+                PopScaleformMovieFunction();                            // end call function
 
-                BeginScaleformMovieMethodV("SET_HEADER_TITLE");        // Call set header function
 
-                //BeginTextCommandScaleformString("STRING");
-                //AddTextComponentSubstringPlayerName(name);        // Set the title
-                //EndTextCommandScaleformString();
-                PushScaleformMovieFunctionParameterString(name);        // Set the title
-
+                // Set header title.
+                BeginScaleformMovieMethodV("SET_HEADER_TITLE");         // Call set header function
+                PushScaleformMovieMethodParameterButtonName(name);      // Set the title
                 PushScaleformMovieFunctionParameterBool(false);         // purpose unknown, is always 0 in decompiled scripts.
-
-
                 PushScaleformMovieFunctionParameterString(subtitle);    // set the subtitle.
-
-                //BeginTextCommandScaleformString("STRING");
-                //AddTextComponentSubstringPlayerName(subtitle);        // Set the subtitle
-                //EndTextCommandScaleformString();
-
                 PushScaleformMovieFunctionParameterBool(true);          // purpose unknown, is always 1 in decompiled scripts.
                 PopScaleformMovieFunctionVoid();                        // finish the set header function
 
 
 
-
-
-
-                //await BaseScript.Delay(500);
+                // column 0 (settings)
                 await BaseScript.Delay(100);
                 UpdateSettings();
                 await BaseScript.Delay(100);
@@ -676,7 +713,7 @@ namespace HuntersVsRunners
                 PopScaleformMovieFunctionVoid();
 
 
-
+                // column 1 (right side mission details)
                 await SetDetailsMissionName("Hunters VS Runners", null, null);
                 await BaseScript.Delay(100);
                 UpdateDetails();
@@ -685,8 +722,7 @@ namespace HuntersVsRunners
                 PushScaleformMovieFunctionParameterInt(1);
                 PopScaleformMovieFunctionVoid();
 
-                //SetColumnTitle(1, "test", "test2");
-
+                // column 3 (middle column: players list)
                 await BaseScript.Delay(100);
                 await UpdateList();
                 await BaseScript.Delay(100);
@@ -694,7 +730,8 @@ namespace HuntersVsRunners
                 PushScaleformMovieFunctionParameterInt(3);
                 PopScaleformMovieFunctionVoid();
 
-                /// ACTIVATE THE FIRST COLUMN (FOCUS).
+
+                // ACTIVATE THE FIRST COLUMN (FOCUS).
                 await BaseScript.Delay(100);
                 PushScaleformMovieFunctionN("SET_COLUMN_FOCUS");
                 PushScaleformMovieFunctionParameterInt(0); // column index // _loc7_
@@ -702,7 +739,8 @@ namespace HuntersVsRunners
                 PushScaleformMovieFunctionParameterBool(true); // scriptSetUniqID // _loc4_
                 PushScaleformMovieFunctionParameterBool(true); // scriptSetMenuState // _loc5_
                 PopScaleformMovieFunctionVoid();
-                //SetFrontendRadioActive(true);
+
+                // Trigger the frontend music. Can be disabled using the option in the menu.
                 SoundController.TriggerSuspenseMusicEvent();
             }
             else
@@ -711,6 +749,10 @@ namespace HuntersVsRunners
             }
         }
 
+        /// <summary>
+        /// Gets the current menu selection.
+        /// </summary>
+        /// <returns></returns>
         public async Task<int> GetSelection()
         {
             BeginScaleformMovieMethodN("GET_COLUMN_SELECTION");
@@ -732,6 +774,12 @@ namespace HuntersVsRunners
             return retInt;
         }
 
+        /// <summary>
+        /// Sets the column title.
+        /// </summary>
+        /// <param name="column"></param>
+        /// <param name="title"></param>
+        /// <param name="thing"></param>
         public void SetColumnTitle(int column, string title, int thing)
         {
             BeginScaleformMovieMethodN("SET_MENU_HEADER_TEXT_BY_INDEX");
@@ -745,6 +793,15 @@ namespace HuntersVsRunners
             PopScaleformMovieFunctionVoid();
         }
 
+        /// <summary>
+        /// Sets the mission details column info.
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="rp"></param>
+        /// <param name="cash"></param>
+        /// <param name="textureDict"></param>
+        /// <param name="textureName"></param>
+        /// <returns></returns>
         public async Task SetDetailsMissionName(string name, string rp, string cash, string textureDict = "prop_screen_nhp_base3", string textureName = "3_2_prep_01")
         {
             if (!HasStreamedTextureDictLoaded(textureDict))
@@ -785,6 +842,11 @@ namespace HuntersVsRunners
 
         }
 
+        /// <summary>
+        /// Updates the settings column (left one).
+        /// </summary>
+        /// <param name="update"></param>
+        /// <param name="row"></param>
         public void UpdateSettings(bool update = false, int row = -1)
         {
             //SetSettingsSlot(0, "Selectable Option #0", "Right Text", true, 0);
@@ -847,6 +909,11 @@ namespace HuntersVsRunners
             SetSettingsCurrentDescription(settingsList[GameController.FeCurrentSelection].Description, false);
         }
 
+
+        /// <summary>
+        /// Gets the selected vehicle model name (hardcoded shit for now).
+        /// </summary>
+        /// <returns></returns>
         private string GetSelectedVehicle()
         {
             int index = settingsList[0].SelectedIndex;
@@ -869,6 +936,12 @@ namespace HuntersVsRunners
             return "invalid";
         }
 
+        /// <summary>
+        /// Gets the data from the selected vehicle to be used in the specs display (settings tab on the left).
+        /// </summary>
+        /// <param name="statType"></param>
+        /// <param name="vehicleModel"></param>
+        /// <returns></returns>
         private float GetStatFromSelectedVehicle(int statType, uint vehicleModel)
         {
             if (statType == 0)
@@ -890,6 +963,15 @@ namespace HuntersVsRunners
             return 0f;
         }
 
+        /// <summary>
+        /// Sets the settings slot.
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="leftText"></param>
+        /// <param name="rightSomething"></param>
+        /// <param name="selectable"></param>
+        /// <param name="type"></param>
+        /// <param name="rowColor"></param>
         private void SetSettingsSlot(int row, string leftText, string rightSomething, bool selectable, int type, int rowColor)
         {
             ///// COLUMN 0 (LEFT) - ROW 1
@@ -941,6 +1023,12 @@ namespace HuntersVsRunners
             PopScaleformMovieFunctionVoid();
         }
 
+        /// <summary>
+        /// Sets the settings slot (vehicle stats information row thingy)
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="leftText"></param>
+        /// <param name="value"></param>
         public void SetSettingsSlotVehicleInfo(int row, string leftText, float value)
         {
             ///// COLUMN 0 (LEFT) - ROW 1
@@ -986,6 +1074,11 @@ namespace HuntersVsRunners
             PopScaleformMovieFunctionVoid();
         }
 
+        /// <summary>
+        /// Sets the description for the currently selected item in the settings column.
+        /// </summary>
+        /// <param name="text"></param>
+        /// <param name="blinkInfoIcon"></param>
         public void SetSettingsCurrentDescription(string text, bool blinkInfoIcon)
         {
             PushScaleformMovieFunctionN("SET_DESCRIPTION");
@@ -996,6 +1089,8 @@ namespace HuntersVsRunners
             //Debug.WriteLine(text);
         }
 
+
+        #region old code
         //public void UpdateSettings(int row, string left, string right, string right2)
         //{
         //    ///// COLUMN 0 (LEFT) - ROW 0
@@ -1027,19 +1122,29 @@ namespace HuntersVsRunners
         //    PopScaleformMovieFunctionVoid();
 
         //}
+        #endregion
 
+        /// <summary>
+        /// Update details column, lots of hardcoded shit atm.
+        /// </summary>
         private void UpdateDetails()
         {
-            //SetDetailsSlot(0, GetLabelText("PM_TYPE"), "Hunters vs Runners");       // Type
+            // SetDetailsSlot(0, GetLabelText("PM_TYPE"), "Hunters vs Runners");    // Type
             SetDetailsSlot(0, GetLabelText("PM_RATING"), "77.3%");                  // Rating
             SetDetailsSlot(1, GetLabelText("PM_CREATED"), "<C>Vespura</C>");        // Created by
-                                                                                    //SetDetailsSlot(2, GetLabelText("PM_RANK"), "1");                      // Opens at Rank
+            // SetDetailsSlot(2, GetLabelText("PM_RANK"), "1");                     // Opens at Rank
             SetDetailsSlot(2, GetLabelText("PM_PLAYERS"), "2-12");                  // Players
             SetDetailsSlot(3, GetLabelText("PM_TEAMS"), "2");                       // Teams
             SetDetailsSlot(4, GetLabelText("PM_AREA"), GetLabelText(GetNameOfZone(2321.30f, 3843.73f, 34.27f))); // Area
             SetDetailsSlot(5, GetLabelText("FM_ISC_DIST"), "6.25 km");              // Distance
         }
 
+        /// <summary>
+        /// Sets the details slot for the function above. Just easier to handle this way.
+        /// </summary>
+        /// <param name="row"></param>
+        /// <param name="leftText"></param>
+        /// <param name="rightText"></param>
         public void SetDetailsSlot(int row, string leftText, string rightText)
         {
             PushScaleformMovieFunctionN("SET_DATA_SLOT");
